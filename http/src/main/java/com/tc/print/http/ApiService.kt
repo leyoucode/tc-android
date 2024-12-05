@@ -51,6 +51,6 @@ interface ApiService {
         @Query("refreshToken") refreshToken: String
     ): Response<ApiResponse<TokenData>>
 
-    @POST("system/auth/login")
+    @POST("admin-api/system/auth/login")
     suspend fun login(@Body loginRequest: LoginRequest): ApiResponse<LoginResponse>
 }

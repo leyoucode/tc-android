@@ -2,9 +2,15 @@ package com.tc.print.pos.activity.login
 
 import android.app.Application
 import androidx.databinding.ObservableField
+import androidx.lifecycle.viewModelScope
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.tc.print.base.BaseViewModel
 import com.tc.print.base.SingleLiveEvent
+import com.tc.print.http.LoginRequest
+import com.tc.print.http.RetrofitService
+import com.tc.print.http.token.TokenManager
+import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application): BaseViewModel(application) {
 
@@ -12,11 +18,17 @@ class LoginViewModel(application: Application): BaseViewModel(application) {
     val password = ObservableField<String>()
     val passwordTwice = ObservableField<String>()
 
+    private val tokenManager by lazy { TokenManager(application) }
+    private val apiService by lazy {
+        RetrofitService.getInstance(tokenManager).createApiService()
+    }
+
     //登录或者注册是否成功
     val actionState = SingleLiveEvent<Boolean>()
 
     init {
-
+        username.set("lylsy")
+        password.set("lylsy")
     }
 
     /**
@@ -28,17 +40,16 @@ class LoginViewModel(application: Application): BaseViewModel(application) {
             return
         }
         ToastUtils.showShort("登录")
-//        viewModelScope.launch {
-//            val data: UserData? = Repository.login(username.get() ?: "", password.get() ?: "")
-//            if (data != null) {
-//                //保存用户名
-//                SPUtils.getInstance().put(Constants.SP_USER_NAME,data.username)
-//                //登录成功
-//                actionState.postValue(true)
-//            } else {
-//                actionState.postValue(false)
-//            }
-//        }
+        viewModelScope.launch {
+            val loginResponse = apiService.login(LoginRequest(username.get() ?: "", password.get() ?: ""))
+            LogUtils.d("======================> ${loginResponse}")
+            if (loginResponse.code == 0) {
+                //登录成功
+                actionState.postValue(true)
+            } else {
+                actionState.postValue(false)
+            }
+        }
     }
 
     /**

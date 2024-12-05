@@ -96,10 +96,10 @@ class RetrofitService private constructor(private val tokenManager: TokenManager
             .build()
     }
 
-//    // 创建API服务实例
-//    fun createApiService(): ApiService {
-//        return retrofit.create(ApiService::class.java)
-//    }
+    // 创建API服务实例
+    fun createApiService(): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
 
     // 处理请求的扩展函数
     suspend fun <T> Call<ApiResponse<T>>.executeWithRetry(): ApiResponse<T> {
